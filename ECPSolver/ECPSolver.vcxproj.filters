@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="solver">
+      <UniqueIdentifier>{0f10a46b-e0a4-4bde-9902-6d8091a2999b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{d7c3fe2d-5fbb-4cee-802d-9a4680f65c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utils">
+      <UniqueIdentifier>{077def31-db97-417e-91dc-436b6d7122b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="checker">
+      <UniqueIdentifier>{2dd43a46-7cba-481d-b04d-a0bc4b35e14b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="solver\evolution.cpp">
+      <Filter>solver</Filter>
+    </ClCompile>
+    <ClCompile Include="solver\greedy.cpp">
+      <Filter>solver</Filter>
+    </ClCompile>
+    <ClCompile Include="solver\tabu.cpp">
+      <Filter>solver</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="checker.cpp">
+      <Filter>checker</Filter>
+    </ClCompile>
+    <ClCompile Include="utils\utility.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="data.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="solver\evolution.hpp">
+      <Filter>solver</Filter>
+    </ClInclude>
+    <ClInclude Include="solver\greedy.hpp">
+      <Filter>solver</Filter>
+    </ClInclude>
+    <ClInclude Include="solver\tabu.hpp">
+      <Filter>solver</Filter>
+    </ClInclude>
+    <ClInclude Include="checker.hpp">
+      <Filter>checker</Filter>
+    </ClInclude>
+    <ClInclude Include="test\test.hpp">
+      <Filter>test</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\utility.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="data.hpp" />
+    <ClInclude Include="common.hpp" />
+  </ItemGroup>
+</Project>

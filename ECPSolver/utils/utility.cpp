@@ -55,7 +55,7 @@ double Random::gen(double ub, double lb) const {
 Log::Log(std::string dir_path) : nb_msg(0) {
     #ifndef CLOSE_ALL_LOGS
     if (dir_path.size()) {
-        ofs.open(dir_path + Date::shortDateStr() + ".txt");
+        ofs.open(dir_path + Date::shortDateStr() + ".log");
         if (ofs.is_open())
             ofs << "Total log number:          " << endl;
     }

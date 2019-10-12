@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <unordered_map>
 
 //#define CLOSE_ALL_LOGS
 
@@ -18,7 +19,7 @@ namespace zjl_utility {
 
 class Timer {
 public:
-    Timer(long interval) :start_time(clock()), end_time(start_time + interval) {};
+    Timer(long long interval) :start_time(clock()), end_time(start_time + interval) {};
 
     bool isTimeOut() const { return clock() > end_time; }
 
@@ -83,6 +84,25 @@ private:
     std::ostringstream oss; // log buffer.
 };
 
+template<typename IdType>
+class IdMapInt {   // the map between identity and zero based integer.
+public:
+    IdType get_id(int num) { return int2id[num]; }
+    int get_num(IdType id) { return id2int[id]; }
+    
+    int add_id(IdType id) {
+        if (id2int.find(id) != id2int.end()) {
+            return id2int[id];
+        } else {
+            int2id.push_back(id);
+            id2int[id] = int2id.size() - 1;
+            return int2id.size() - 1;
+        }
+    }
+private:
+    std::vector<IdType> int2id;
+    std::unordered_map<IdType, int> id2int;
+};
 
 #pragma region Non-member function
 inline std::string itos(int i) {
@@ -97,7 +117,7 @@ inline bool equal(double lhs, double rhs, double eps = 0.00001) {
 
 
 #pragma region External_variable
-extern Log mylog;   // unique log object for the project.
+extern Log mylog;   // golbal log object for the project.
 
 extern LogSwitch logsw_debug;
 extern LogSwitch logsw_info;

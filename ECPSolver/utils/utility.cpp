@@ -43,7 +43,8 @@ void Random::setSeed(unsigned int seed) {
 
 int Random::gen(int ub, int lb) const {
     // [zjl][TODO] : add intput parameter check.
-    return rand() % (ub - lb + 1) + lb;
+    // [zjl][BUG] : when ub - lb > INT_MAX, result will be wrong.
+    return rand() % (ub - lb) + lb;
 }
 
 double Random::gen(double ub, double lb) const {

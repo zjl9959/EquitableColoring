@@ -2,7 +2,7 @@
 #define ECPSOLVER_DATA_H
 
 #include "common.hpp"
-#include "utils/utility.h"
+#include "utils/utility.hpp"
 
 namespace solver {
 
@@ -61,7 +61,7 @@ struct Graph {
 
 struct Input {
     #pragma region constructor
-    Input(int _nb_color, long long _timeout_ms, unsigned int _rand_seed,
+    Input(int _nb_color, long _timeout_ms, unsigned int _rand_seed,
         const String &_instance_name, const String &_configure_name = "") :
         nb_color(_nb_color), timeout_ms(_timeout_ms), rand(_rand_seed),
         env(_instance_name, _configure_name), cfg(env.configure_path()), graph(env.instance_path()) {};
@@ -69,7 +69,7 @@ struct Input {
 
     #pragma region variables
     int nb_color;   // available color number.
-    long long timeout_ms;   // maximum time out millisecond.
+    long timeout_ms;   // maximum time out millisecond.
     zjl_utility::Random rand;
 
     Environment env;

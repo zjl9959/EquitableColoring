@@ -49,10 +49,10 @@
     <ClInclude Include="test\test.hpp">
       <Filter>test</Filter>
     </ClInclude>
-    <ClInclude Include="utils\utility.h">
-      <Filter>utils</Filter>
-    </ClInclude>
     <ClInclude Include="data.hpp" />
     <ClInclude Include="common.hpp" />
+    <ClInclude Include="utils\utility.hpp">
+      <Filter>utils</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

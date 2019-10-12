@@ -6,6 +6,7 @@
 #ifndef ZJL_UTILITY_H
 #define ZJL_UTILITY_H
 #include <ctime>
+#include <vector>
 #include <string>
 #include <sstream>
 #include <fstream>
@@ -19,7 +20,7 @@ namespace zjl_utility {
 
 class Timer {
 public:
-    Timer(long long interval) :start_time(clock()), end_time(start_time + interval) {};
+    Timer(long interval) :start_time(clock()), end_time(start_time + interval) {};
 
     bool isTimeOut() const { return clock() > end_time; }
 
@@ -76,8 +77,31 @@ public:
     }
 
     template<>
-    Log& operator<< <LogSwitch> (const LogSwitch &info);
-
+    Log& operator<<<LogSwitch>(const LogSwitch &info) {
+        #ifndef CLOSE_ALL_LOGS
+        if (info.msg_on) {
+            if (info.time_on) {
+                clock_t now = clock();
+                if (now > 99999) {
+                    std::cout << "[" << now / 1000 << "s]";
+                    if (ofs.is_open()) ofs << "[" << now / 1000 << "s]";
+                } else {
+                    std::cout << "[" << now << "ms]";
+                    if (ofs.is_open()) ofs << "[" << now << "ms]";
+                }
+            }
+            if (info.name.size()) {
+                std::cout << "[" << info.name << "]";
+                if (ofs.is_open())ofs << "[" << info.name << "]";
+            }
+            std::cout << oss.str() << std::endl;
+            if (ofs.is_open())ofs << oss.str() << std::endl;
+            nb_msg++;
+        }
+        oss.str("");
+        #endif
+        return *this;
+    }
 private:
     size_t nb_msg;  // log number.
     std::ofstream ofs;
@@ -95,8 +119,8 @@ public:
             return id2int[id];
         } else {
             int2id.push_back(id);
-            id2int[id] = int2id.size() - 1;
-            return int2id.size() - 1;
+            id2int[id] = static_cast<int>(int2id.size()) - 1;
+            return static_cast<int>(int2id.size()) - 1;
         }
     }
 private:
@@ -117,7 +141,7 @@ inline bool equal(double lhs, double rhs, double eps = 0.00001) {
 
 
 #pragma region External_variable
-extern Log mylog;   // golbal log object for the project.
+extern Log mylog;   // global log object for the project.
 
 extern LogSwitch logsw_debug;
 extern LogSwitch logsw_info;

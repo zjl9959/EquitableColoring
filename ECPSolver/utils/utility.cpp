@@ -2,7 +2,8 @@
 *@email:zjluestc@outlook.com
 *@created date:2019/5/16
 ******************************/
-#include "utility.h"
+#include "utility.hpp"
+
 #include <iomanip>
 #include <random>
 #include <cmath>
@@ -14,14 +15,18 @@ namespace zjl_utility {
 const string Date::shortDateStr() {
     ostringstream os;
     time_t now = std::time(0);
-    os << std::put_time(std::localtime(&now), "%Y%m%d%H%M%S");
+    tm s_time;
+    localtime_s(&s_time, &now);
+    os << std::put_time(&s_time, "%Y%m%d%H%M%S");
     return os.str();
 }
 
 const string Date::humanDataStr() {
     ostringstream os;
     time_t now = std::time(0);
-    os << std::put_time(std::localtime(&now), "%Y-%m-%d/%H:%M:%S");
+    tm s_time;
+    localtime_s(&s_time, &now);
+    os << std::put_time(&s_time, "%Y-%m-%d/%H:%M:%S");
     return os.str();
 }
 
@@ -70,33 +75,6 @@ Log::~Log() {
         ofs.close();
     }
     #endif // !CLOSE_ALL_LOGS
-}
-
-template<>
-Log & Log::operator<< <LogSwitch>(const LogSwitch & info) {
-    #ifndef CLOSE_ALL_LOGS
-    if (info.msg_on) {
-        if (info.time_on) {
-            clock_t now = clock();
-            if (now > 99999) {
-                std::cout << "[" << now / 1000 << "s]";
-                if (ofs.is_open()) ofs << "[" << now / 1000 << "s]";
-            } else {
-                std::cout << "[" << now << "ms]";
-                if (ofs.is_open()) ofs << "[" << now << "ms]";
-            }
-        }
-        if (info.name.size()) {
-            std::cout << "[" << info.name << "]";
-            if (ofs.is_open())ofs << "[" << info.name << "]";
-        }
-        std::cout << oss.str() << std::endl;
-        if (ofs.is_open())ofs << oss.str() << std::endl;
-        nb_msg++;
-    }
-    oss.str("");
-    #endif
-    return *this;
 }
 
 // init static variable and golball variable.

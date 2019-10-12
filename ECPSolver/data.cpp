@@ -18,7 +18,7 @@ Graph::Graph(const String &path) {
 }
 
 Configure::Configure(const String &path) {
-    load_configure(*this, path);
+    //load_configure(*this, path);
 }
 
 void Output::save(const String &path, const zjl_utility::IdMapInt<int> &id_map) {
@@ -34,7 +34,7 @@ void Output::save(const String &path, const zjl_utility::IdMapInt<int> &id_map) 
 void load_graph_col(Graph &graph, const String &path) {
     ifstream ifs(path);
     if (!ifs.is_open()) {
-        throw "file " + path + " not exist!";
+        throw "Can't open instance file!";
     }
     string line;
     while (getline(ifs, line))
@@ -45,10 +45,10 @@ void load_graph_col(Graph &graph, const String &path) {
         if (node1 == node2) continue;   // remove self in edge.
         int n1 = graph.node_id_map.add_id(node1);
         int n2 = graph.node_id_map.add_id(node2);
-        string edge_str = to_string(n1) + to_string(n2);
+        int temp = n1; n1 = min(n1, n2); n2 = max(temp, n2);
+        string edge_str = to_string(n1) + '\0' + to_string(n2);
         if (edge_set.find(edge_str) != edge_set.end()) continue;    // remove duplicated edge.
         edge_set.insert(edge_str);
-        n1 = min(n1, n2); n2 = max(n1, n2);
         if (graph.neighbors.size() <= n2)
             graph.neighbors.resize(n2 + 1);
         graph.neighbors[n1].push_back(n2);
@@ -57,13 +57,13 @@ void load_graph_col(Graph &graph, const String &path) {
     graph.nb_node = graph.neighbors.size();
     graph.nb_edge = edge_set.size();
     mylog << "load instance:" << path << logsw_info;
-    mylog << "graph information:\n node number£º" << graph.nb_node
-        << " edge number:" << graph.nb_edge << logsw_info;
+    mylog << "graph information: node number£º" << graph.nb_node
+        << ";edge number:" << graph.nb_edge << logsw_info;
 }
 
 void load_configure(Configure &cfg, const String &path) {
     // [zjl][TODO] : add implement.
-    throw "not implement!";
+    throw "Not implement!";
 }
 
 }

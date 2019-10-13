@@ -21,13 +21,6 @@ Configure::Configure(const String &path) {
     //load_configure(*this, path);
 }
 
-void Output::save(const String &path, const zjl_utility::IdMapInt<int> &id_map) {
-    ofstream ofs(path);
-    if (!ofs.is_open())
-        return;
-    // [zjl][TODO] : add code.
-}
-
 /*
 * load graph from file with ".col" suffix.
 */
@@ -64,6 +57,29 @@ void load_graph_col(Graph &graph, const String &path) {
 void load_configure(Configure &cfg, const String &path) {
     // [zjl][TODO] : add implement.
     throw "Not implement!";
+}
+
+void save_solution(const Solution &sol, const String &path, const IdMapInt<int> &id_map) {
+    ofstream ofs(path);
+    if (!ofs.is_open())
+        return;
+    unordered_map<int, List<int>> color_nodes;
+    for (int i = 0; i < sol.node_color.size(); ++i) {
+        auto pos = color_nodes.find(sol.node_color[i]);
+        if (pos != color_nodes.end()) {
+            pos->second.push_back(i);
+        } else {
+            List<int> temp; temp.push_back(i);
+            color_nodes.insert(make_pair(sol.node_color[i], temp));
+        }
+    }
+    ofs << "nodes sets:" << endl;
+    for (auto it = color_nodes.begin(); it != color_nodes.end(); ++it) {
+        for (int node : it->second) {
+            ofs << id_map.get_id(node) << " ";
+        }
+        ofs << endl;
+    }
 }
 
 }

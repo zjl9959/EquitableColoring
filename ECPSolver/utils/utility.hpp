@@ -111,8 +111,8 @@ private:
 template<typename IdType>
 class IdMapInt {   // the map between identity and zero based integer.
 public:
-    IdType get_id(int num) { return int2id[num]; }
-    int get_num(IdType id) { return id2int[id]; }
+    IdType get_id(int num) const { return int2id[num]; }
+    int get_num(IdType id) const { return id2int[id]; }
     
     int add_id(IdType id) {
         if (id2int.find(id) != id2int.end()) {

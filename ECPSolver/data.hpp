@@ -40,10 +40,10 @@ struct Configure {
     #pragma endregion
 };
 
-struct Assignment {
+struct Move {
     int node;   // node identity.
-    int color;  // the color assigned to node.
-    Assignment(int _node = INVALID, int _color = INVALID) : node(_node), color(_color) {};
+    int old_color;  // the old color assigned to node.
+    int new_color;  // the new color assigned to node.
 };
 
 struct Graph {
@@ -61,15 +61,15 @@ struct Graph {
 
 struct Input {
     #pragma region constructor
-    Input(int _nb_color, long _timeout_ms, unsigned int _rand_seed,
+    Input(int _nb_color, long timeout_ms, unsigned int rand_seed,
         const String &_instance_name, const String &_configure_name = "") :
-        nb_color(_nb_color), timeout_ms(_timeout_ms), rand(_rand_seed),
+        nb_color(_nb_color), timer(timeout_ms), rand(rand_seed),
         env(_instance_name, _configure_name), cfg(env.configure_path()), graph(env.instance_path()) {};
     #pragma endregion
 
     #pragma region variables
     int nb_color;   // available color number.
-    long timeout_ms;   // maximum time out millisecond.
+    zjl_utility::Timer timer;
     zjl_utility::Random rand;
 
     Environment env;
@@ -78,15 +78,22 @@ struct Input {
     #pragma endregion
 };
 
-struct Output {
-    #pragma region interface
-    void save(const String &path, const zjl_utility::IdMapInt<int> &id_map);
+struct Solution {
+    #pragma region functions
+    void update(const Move &move) {
+        node_color[move.node] = move.new_color;
+        color_size[move.old_color]--;
+        color_size[move.new_color]++;
+    }
     #pragma endregion
 
     #pragma region variables
-    List<Assignment> assignments;
+    List<int> node_color;
+    List<int> color_size;
     #pragma endregion
 };
+
+void save_solution(const Solution &sol, const String &path, const zjl_utility::IdMapInt<int> &id_map);
 
 }
 

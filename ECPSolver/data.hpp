@@ -36,7 +36,7 @@ struct Configure {
     #pragma endregion
 
     #pragma region variables
-    // [zjl][TODO] : add variables.
+    int max_chain;   // maximum ejection chain length.
     #pragma endregion
 };
 
@@ -78,19 +78,32 @@ struct Input {
     #pragma endregion
 };
 
-struct Solution {
-    #pragma region functions
-    void update(const Move &move) {
-        node_color[move.node] = move.new_color;
-        color_size[move.old_color]--;
-        color_size[move.new_color]++;
+class Solution {
+public:
+    Solution(int nb_node, int nb_color) : nb_node_(nb_node), nb_color_(nb_color) {
+        node_color_.resize(nb_node);
+        node_index_.resize(nb_node);
+        color_nodes_.resize(nb_color, List<int> {});
     }
-    #pragma endregion
 
-    #pragma region variables
-    List<int> node_color;
-    List<int> color_size;
-    #pragma endregion
+    void update(const Move &move) {
+        node_color_[move.node] = move.new_color;
+        color_nodes_[move.old_color][node_index_[move.node]] = color_nodes_[move.old_color].back();
+        color_nodes_[move.old_color].pop_back();
+        color_nodes_[move.new_color].push_back(move.node);
+        node_index_[move.node] = color_nodes_[move.new_color].size() - 1;
+    }
+
+    int node_number() const { return nb_node_; }
+    int color_number() const { return nb_color_; }
+    int node_color(int node) const { return node_color_[node]; }
+    const List<int>& color_nodes(int color) const { return color_nodes_[color]; }
+private:
+    int nb_node_;   // vertex node number in solution.
+    int nb_color_;  // color number in solution.
+    List<int> node_color_;  // color in node.
+    List<int> node_index_;  // node index in color set.
+    List<List<int>> color_nodes_;   // nodes in color set.
 };
 
 void save_solution(const Solution &sol, const String &path, const zjl_utility::IdMapInt<int> &id_map);

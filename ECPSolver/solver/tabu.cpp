@@ -24,6 +24,9 @@ TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(in
 }
 
 bool TabuSearch::run() {
+    while (!input_.timer.isTimeOut()) {
+        // TODO
+    }
     return false;
 }
 

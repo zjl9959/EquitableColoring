@@ -36,7 +36,14 @@ struct Configure {
     #pragma endregion
 
     #pragma region variables
-    int max_chain;   // maximum ejection chain length.
+    // maximum ejection chain length.
+    int max_chain_length = 5;
+    
+    // the possibility to choose the greedy improve move in ejection_chain_search.
+    double ejection_greedy_rate = 0.50;
+
+    // random perturbation rate in tabu_search.
+    double perturbation_rate = 0.50;
     #pragma endregion
 };
 
@@ -44,6 +51,8 @@ struct Move {
     int node;   // node identity.
     int old_color;  // the old color assigned to node.
     int new_color;  // the new color assigned to node.
+    Move(int _node, int _old_color, int _new_color) :
+        node(_node), old_color(_old_color), new_color(_new_color) {}
 };
 
 struct Graph {
@@ -81,11 +90,19 @@ struct Input {
 class Solution {
 public:
     Solution(int nb_node, int nb_color) : nb_node_(nb_node), nb_color_(nb_color) {
-        node_color_.resize(nb_node);
-        node_index_.resize(nb_node);
+        node_color_.resize(nb_node, INVALID);
+        node_index_.resize(nb_node, INVALID);
         color_nodes_.resize(nb_color, List<int> {});
     }
 
+    /* Assign one color for one node. */
+    void assign(int node, int color) {
+        node_color_[node] = color;
+        node_index_[node] = color_nodes_[color].size();
+        color_nodes_[color].push_back(node);
+    }
+
+    /* Move one node from old_color to new_color. */
     void update(const Move &move) {
         node_color_[move.node] = move.new_color;
         color_nodes_[move.old_color][node_index_[move.node]] = color_nodes_[move.old_color].back();
@@ -96,6 +113,7 @@ public:
 
     int node_number() const { return nb_node_; }
     int color_number() const { return nb_color_; }
+
     int node_color(int node) const { return node_color_[node]; }
     const List<int>& color_nodes(int color) const { return color_nodes_[color]; }
 private:

@@ -89,39 +89,35 @@ struct Input {
 
 class Solution {
 public:
-    Solution(int nb_node, int nb_color) : nb_node_(nb_node), nb_color_(nb_color) {
+    Solution(int nb_node, int nb_color) {
         node_color_.resize(nb_node, INVALID);
-        node_index_.resize(nb_node, INVALID);
-        color_nodes_.resize(nb_color, List<int> {});
+        color_size_.resize(nb_color, 0);
     }
 
-    /* Assign one color for one node. */
+    int operator[] (int node) const {
+        return node_color_[node];
+    }
+
+    int color_size(int node) const {
+        return color_size_[node];
+    }
+
+    int nb_node() const { return node_color_.size(); }
+    int nb_color() const { return color_size_.size(); }
+
     void assign(int node, int color) {
         node_color_[node] = color;
-        node_index_[node] = color_nodes_[color].size();
-        color_nodes_[color].push_back(node);
+        color_size_[color]++;
     }
 
-    /* Move one node from old_color to new_color. */
-    void update(const Move &move) {
-        node_color_[move.node] = move.new_color;
-        color_nodes_[move.old_color][node_index_[move.node]] = color_nodes_[move.old_color].back();
-        color_nodes_[move.old_color].pop_back();
-        color_nodes_[move.new_color].push_back(move.node);
-        node_index_[move.node] = color_nodes_[move.new_color].size() - 1;
+    void update(int node, int color) {
+        color_size_[node_color_[node]]--;
+        node_color_[node] = color;
+        color_size_[color]++;
     }
-
-    int node_number() const { return nb_node_; }
-    int color_number() const { return nb_color_; }
-
-    int node_color(int node) const { return node_color_[node]; }
-    const List<int>& color_nodes(int color) const { return color_nodes_[color]; }
 private:
-    int nb_node_;   // vertex node number in solution.
-    int nb_color_;  // color number in solution.
-    List<int> node_color_;  // color in node.
-    List<int> node_index_;  // node index in color set.
-    List<List<int>> color_nodes_;   // nodes in color set.
+    List<int> node_color_;  // node's color.
+    List<int> color_size_;  // color set size.
 };
 
 void save_solution(const Solution &sol, const String &path, const zjl_utility::IdMapInt<int> &id_map);

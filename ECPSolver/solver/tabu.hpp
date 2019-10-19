@@ -12,9 +12,9 @@ public:
     TabuSearch(const Input &input, const Solution &init_sol);
     bool run();
 private:
-    void ejection_local_search();
+    void ejection_local_search(List<Move> &best_moves);
     void get_max_conflict_nodes(const Solution &sol, const Table &conflict_table, List<int> &nodes);
-    void update_conflict_table(const Solution &sol, const Move &move, Table &conflict_table);
+    int update_conflict_table(const Solution &sol, const Move &move, Table &conflict_table);
 private:
     int best_obj_, cur_obj_;
     Solution best_sol_, cur_sol_;

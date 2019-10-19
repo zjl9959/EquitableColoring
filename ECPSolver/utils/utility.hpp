@@ -59,6 +59,7 @@ struct LogSwitch {
     bool msg_on;        // print this log or not.
     bool time_on;       // print timestamp or not.
     std::string name;   // logSwitch name.
+    // eg: 0, 1, "DEBUG"
     LogSwitch(bool msg_on_ = false, bool time_on_ = false, std::string name_ = "") :
         msg_on(msg_on_), time_on(time_on_), name(name_) {}
 };

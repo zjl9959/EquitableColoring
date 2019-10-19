@@ -63,9 +63,17 @@ void save_solution(const Solution &sol, const String &path, const IdMapInt<int> 
     ofstream ofs(path);
     if (!ofs.is_open())
         return;
+    unordered_map<int, List<int>> nodes_set;
+    for (int n = 0; n < sol.nb_node(); ++n) {
+        if (nodes_set.count(sol[n])) {
+            nodes_set[sol[n]].push_back(n);
+        } else {
+            nodes_set[sol[n]] = { n };
+        }
+    }
     ofs << "nodes sets:" << endl;
-    for (int c = 0; c < sol.color_number(); ++c) {
-        for (int node : sol.color_nodes(c)) {
+    for (int c = 0; c < sol.nb_color(); ++c) {
+        for (int node : nodes_set[c]) {
             ofs << id_map.get_id(node) << " ";
         }
         ofs << endl;

@@ -47,8 +47,8 @@ void load_graph_col(Graph &graph, const String &path) {
         graph.neighbors[n1].push_back(n2);
         graph.neighbors[n2].push_back(n1);
     }
-    graph.nb_node = graph.neighbors.size();
-    graph.nb_edge = edge_set.size();
+    graph.nb_node = static_cast<int>(graph.neighbors.size());
+    graph.nb_edge = static_cast<int>(edge_set.size());
     mylog << "load instance:" << path << logsw_info;
     mylog << "graph information: node number£º" << graph.nb_node
         << ";edge number:" << graph.nb_edge << logsw_info;

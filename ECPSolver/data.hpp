@@ -39,10 +39,10 @@ struct Configure {
     // maximum ejection chain length.
     int max_chain_length = 5;
     
-    // the possibility to choose the greedy improve move in ejection_chain_search.
+    // the possibility to choose the greedy improve move in ejection_chain_search(range:[0.0, 1.0]).
     double ejection_greedy_rate = 0.50;
 
-    // random perturbation rate in tabu_search.
+    // random perturbation rate in tabu_search(range:[0.0, 1.0]).
     double perturbation_rate = 0.50;
     #pragma endregion
 };
@@ -51,8 +51,9 @@ struct Move {
     int node;   // node identity.
     int old_color;  // the old color assigned to node.
     int new_color;  // the new color assigned to node.
-    Move(int _node, int _old_color, int _new_color) :
+    Move(int _node = INVALID, int _old_color = INVALID, int _new_color = INVALID) :
         node(_node), old_color(_old_color), new_color(_new_color) {}
+    Move(const Move &rhs) : node(rhs.node), old_color(rhs.old_color), new_color(rhs.new_color) {}
 };
 
 struct Graph {
@@ -61,8 +62,8 @@ struct Graph {
     #pragma endregion
 
     #pragma region variables
-    size_t nb_node;
-    size_t nb_edge;
+    int nb_node;
+    int nb_edge;
     List<List<int>> neighbors;
     zjl_utility::IdMapInt<int> node_id_map;
     #pragma endregion
@@ -99,11 +100,11 @@ public:
     }
 
     int color_size(int node) const {
-        return color_size_[node];
+        return color_size_[node_color_[node]];
     }
 
-    int nb_node() const { return node_color_.size(); }
-    int nb_color() const { return color_size_.size(); }
+    int nb_node() const { return static_cast<int>(node_color_.size()); }
+    int nb_color() const { return static_cast<int>(color_size_.size()); }
 
     void assign(int node, int color) {
         node_color_[node] = color;
@@ -114,6 +115,21 @@ public:
         color_size_[node_color_[node]]--;
         node_color_[node] = color;
         color_size_[color]++;
+    }
+
+    void remove(int node) {
+        color_size_[node_color_[node]]--;
+        node_color_[node] = INVALID;
+    }
+
+    bool check_equitable() {
+        int min_color_size = INT_MAX;
+        int max_color_size = 0;
+        for (int cs : color_size_) {
+            min_color_size = std::min(min_color_size, cs);
+            max_color_size = std::max(max_color_size, cs);
+        }
+        return max_color_size - min_color_size <= 1;
     }
 private:
     List<int> node_color_;  // node's color.

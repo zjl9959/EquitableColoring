@@ -47,9 +47,9 @@ public:
 
     unsigned int getSeed() const { return seed_; }
 
-    int gen(int ub = INT_MAX, int lb = 0) const;
+    int genInt(int ub = INT_MAX, int lb = 0) const;
 
-    double gen(double ub = 1.0, double lb = 0.0) const;
+    double genDouble(double ub = 1.0, double lb = 0.0) const;
 private:
     static bool set_seed_;
     static unsigned int seed_;

@@ -21,9 +21,7 @@ Configure::Configure(const String &path) {
     //load_configure(*this, path);
 }
 
-/*
-* load graph from file with ".col" suffix.
-*/
+/* load graph from file with ".col" suffix. */
 void load_graph_col(Graph &graph, const String &path) {
     ifstream ifs(path);
     if (!ifs.is_open()) {
@@ -71,12 +69,38 @@ void save_solution(const Solution &sol, const String &path, const IdMapInt<int> 
             nodes_set[sol[n]] = { n };
         }
     }
-    ofs << "nodes sets:" << endl;
+    ofs << "n " << sol.nb_node() << endl;
+    ofs << "c " << nodes_set.size() << endl;
     for (int c = 0; c < sol.nb_color(); ++c) {
         for (int node : nodes_set[c]) {
             ofs << id_map.get_id(node) << " ";
         }
         ofs << endl;
+    }
+}
+
+Solution::Solution(String &path) {
+    ifstream ifs(path);
+    if (!ifs.is_open())return;
+    string line;
+    char c; int num;
+    // first line: node number.
+    getline(ifs, line);
+    istringstream(line) >> c >> num;
+    node_color_.resize(num, INVALID);
+    // second line: color number.
+    getline(ifs, line);
+    istringstream(line) >> c >> num;
+    color_size_.resize(num, 0);
+    // create initial solution.
+    int cur_color = 0;
+    while (getline(ifs, line)) {
+        istringstream istr(line);
+        while (istr >> num) {
+            node_color_[num] = cur_color;
+            ++color_size_[cur_color];
+        }
+        ++cur_color;
     }
 }
 

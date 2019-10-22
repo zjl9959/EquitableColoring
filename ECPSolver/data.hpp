@@ -90,6 +90,10 @@ struct Input {
 
 class Solution {
 public:
+    /* load initial solution from file. */
+    Solution(String &path);
+
+    /* create an empty solution. */
     Solution(int nb_node, int nb_color) {
         node_color_.resize(nb_node, INVALID);
         color_size_.resize(nb_color, 0);

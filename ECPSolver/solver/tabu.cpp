@@ -36,6 +36,8 @@ bool TabuSearch::run() {
             update_conflict_table(cur_sol_, *it, conflict_table_);
         }
         cur_obj_ += delt;
+        int obj_verify = verify_obj();
+        assert(cur_obj_ == obj_verify); // check objective match.
         // update best_sol_.
         if (cur_obj_ < best_obj_) {
             best_obj_ = cur_obj_;
@@ -150,6 +152,7 @@ void TabuSearch::update_conflict_table(const Solution &sol, const Move &move, Ta
     }
 }
 
+/* RETURN: current solution's objective. */
 int TabuSearch::verify_obj() const {
     int ojbk = 0;
     for (int i = 0; i < input_.graph.nb_node; ++i) {

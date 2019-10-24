@@ -79,25 +79,29 @@ void save_solution(const Solution &sol, const String &path, const IdMapInt<int> 
     }
 }
 
-Solution::Solution(String &path) {
+Solution::Solution(const String &path, const IdMapInt<int> &id_map) {
+    // [zjl][TEST]: not test!.
     ifstream ifs(path);
     if (!ifs.is_open())return;
     string line;
-    char c; int num;
+    char c; int nb_node; int nb_color;
     // first line: node number.
     getline(ifs, line);
-    istringstream(line) >> c >> num;
-    node_color_.resize(num, INVALID);
+    istringstream(line) >> c >> nb_node;
+    node_color_.resize(nb_node, INVALID);
     // second line: color number.
     getline(ifs, line);
-    istringstream(line) >> c >> num;
-    color_size_.resize(num, 0);
+    istringstream(line) >> c >> nb_color;
+    color_size_.resize(nb_color, false);
+    small_color_size_ = nb_node / nb_color;
     // create initial solution.
-    int cur_color = 0;
+    int node;   // save node identity from istream.
+    int cur_color = 0;  // index current color set identity.
     while (getline(ifs, line)) {
+        int set_size_count = 0;
         istringstream istr(line);
-        while (istr >> num) {
-            node_color_[num] = cur_color;
+        while (istr >> node) {
+            node_color_[id_map.get_num(node)] = cur_color;
             ++color_size_[cur_color];
         }
         ++cur_color;

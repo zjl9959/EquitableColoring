@@ -88,10 +88,11 @@ struct Input {
     #pragma endregion
 };
 
+/* Equitable solution with zero or some conflict edges. */
 class Solution {
 public:
     /* load initial solution from file. */
-    Solution(String &path);
+    Solution(const String &path, const zjl_utility::IdMapInt<int> &id_map);
 
     /* create an empty solution. */
     Solution(int nb_node, int nb_color) {
@@ -103,8 +104,9 @@ public:
         return node_color_[node];
     }
 
-    int color_size(int node) const {
-        return color_size_[node_color_[node]];
+    /* check if node in small color set. */
+    bool in_small_color(int node) const {
+        return color_size_[node_color_[node]] == small_color_size_;
     }
 
     int nb_node() const { return static_cast<int>(node_color_.size()); }
@@ -125,19 +127,10 @@ public:
         color_size_[node_color_[node]]--;
         node_color_[node] = INVALID;
     }
-
-    bool check_equitable() {
-        int min_color_size = INT_MAX;
-        int max_color_size = 0;
-        for (int cs : color_size_) {
-            min_color_size = std::min(min_color_size, cs);
-            max_color_size = std::max(max_color_size, cs);
-        }
-        return max_color_size - min_color_size <= 1;
-    }
 private:
+    int small_color_size_;
     List<int> node_color_;  // node's color.
-    List<int> color_size_;  // color set size.
+    List<int> color_size_;  // mark this color set as small color set.
 };
 
 void save_solution(const Solution &sol, const String &path, const zjl_utility::IdMapInt<int> &id_map);

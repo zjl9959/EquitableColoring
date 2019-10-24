@@ -18,9 +18,6 @@
     <ClCompile Include="solver\evolution.cpp">
       <Filter>solver</Filter>
     </ClCompile>
-    <ClCompile Include="solver\greedy.cpp">
-      <Filter>solver</Filter>
-    </ClCompile>
     <ClCompile Include="solver\tabu.cpp">
       <Filter>solver</Filter>
     </ClCompile>
@@ -37,9 +34,6 @@
     <ClInclude Include="solver\evolution.hpp">
       <Filter>solver</Filter>
     </ClInclude>
-    <ClInclude Include="solver\greedy.hpp">
-      <Filter>solver</Filter>
-    </ClInclude>
     <ClInclude Include="solver\tabu.hpp">
       <Filter>solver</Filter>
     </ClInclude>
@@ -53,6 +47,9 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="utils\utility.hpp">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="solver\gen_init_sol.hpp">
+      <Filter>solver</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

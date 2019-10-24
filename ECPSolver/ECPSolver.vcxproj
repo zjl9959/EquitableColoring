@@ -125,7 +125,6 @@
     <ClCompile Include="data.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="solver\evolution.cpp" />
-    <ClCompile Include="solver\greedy.cpp" />
     <ClCompile Include="solver\tabu.cpp" />
     <ClCompile Include="utils\utility.cpp" />
   </ItemGroup>
@@ -134,7 +133,7 @@
     <ClInclude Include="common.hpp" />
     <ClInclude Include="data.hpp" />
     <ClInclude Include="solver\evolution.hpp" />
-    <ClInclude Include="solver\greedy.hpp" />
+    <ClInclude Include="solver\gen_init_sol.hpp" />
     <ClInclude Include="solver\tabu.hpp" />
     <ClInclude Include="test\test.hpp" />
     <ClInclude Include="utils\utility.hpp" />

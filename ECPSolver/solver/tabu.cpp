@@ -45,7 +45,7 @@ bool TabuSearch::run() {
             mylog << "A better obj:" << best_obj_ << logsw_info;
         }
         // check best_obj_'s equitable.
-        if (best_obj_ == 0 && best_sol_.check_equitable()) {
+        if (best_obj_ == 0) {
             return true;
         }
         if (delt < 0) {
@@ -74,7 +74,6 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
         int obj = cur_obj_ - Ct[node][S[node]];
         update_conflict_table(S, Move(node, S[node], INVALID), Ct);
         int ejected_node_color = S[node];
-        int min_set_size = S.color_size(node);
         int trial_color = S[node];   // the color where ejected node finally will be put back.
         int chain_length = 0;   // ejection chain length.
         S.remove(node);
@@ -97,7 +96,7 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
             int best_move2_delt = input_.graph.nb_edge;    // smaller is better.
             Move best_move2;
             for (int n = 0; n < input_.graph.nb_node; ++n) {
-                if (n != node && S[n] != trial_color && S.color_size(n) >= min_set_size) {   // [zjl][TODO]: consider tabu table.
+                if (n != node && S[n] != trial_color && S.in_small_color(n)) {   // [zjl][TODO]: consider tabu table.
                     int move2_delt = Ct[n][trial_color] - Ct[n][S[n]];
                     if (move2_delt < best_move2_delt || (move2_delt == best_move2_delt &&
                         input_.rand.genInt(pool_sampling_count) == 0)) {

@@ -18,6 +18,8 @@ TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(in
     cur_obj_ = 0;
     for (int i = 0; i < input_.graph.nb_node; ++i)
         cur_obj_ += conflict_table_[i][cur_sol_[i]];
+    assert(cur_obj_ % 2 == 0);
+    cur_obj_ /= 2;
     best_obj_ = cur_obj_;
     // [zjl][TODO] : init tabu_table
 }
@@ -28,7 +30,7 @@ bool TabuSearch::run() {
         List<Move> best_moves;
         ejection_local_search(best_moves);  // find move.
         assert(best_moves.size() <= input_.cfg.max_chain_length);
-        // make move.
+        // make move and update cur_obj_.
         int delt = 0;
         for (auto it = best_moves.begin(); it != best_moves.end(); ++it) {
             delt += conflict_table_[it->node][it->new_color] - conflict_table_[it->node][it->old_color];
@@ -80,11 +82,7 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
         List<Move> move_chain;  // current ejection chain iteration moves.
         while (chain_length < input_.cfg.max_chain_length) {
             // try to put the node into trial color and update.[not really put the node back]
-            int delt = 0;
-            for (int neighbor : input_.graph.neighbors[node]) {
-                if (S[neighbor] == trial_color)
-                    ++delt;
-            }
+            int delt = conflict_table_[node][trial_color];
             if (obj + delt < best_obj) {
                 best_obj = obj + delt;
                 best_moves = move_chain;
@@ -96,7 +94,7 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
             int best_move2_delt = input_.graph.nb_edge;    // smaller is better.
             Move best_move2;
             for (int n = 0; n < input_.graph.nb_node; ++n) {
-                if (n != node && S[n] != trial_color && S.in_small_color(n)) {   // [zjl][TODO]: consider tabu table.
+                if (n != node && S[n] != trial_color && !S.in_small_color(n)) {   // [zjl][TODO]: consider tabu table.
                     int move2_delt = Ct[n][trial_color] - Ct[n][S[n]];
                     if (move2_delt < best_move2_delt || (move2_delt == best_move2_delt &&
                         input_.rand.genInt(pool_sampling_count) == 0)) {
@@ -142,12 +140,10 @@ void TabuSearch::get_max_conflict_nodes(const Solution &sol, const Table &confli
 
 void TabuSearch::update_conflict_table(const Solution &sol, const Move &move, Table &conflict_table) const {
     for (int node : input_.graph.neighbors[move.node]) {
-        if (sol[node] == move.old_color) {
+        if(move.old_color != INVALID)
             conflict_table[node][move.old_color]--;
-        }
-        if (sol[node] == move.new_color) {
+        if(move.new_color != INVALID)
             conflict_table[node][move.new_color]++;
-        }
     }
 }
 
@@ -157,6 +153,8 @@ int TabuSearch::verify_obj() const {
     for (int i = 0; i < input_.graph.nb_node; ++i) {
         ojbk += conflict_table_[i][cur_sol_[i]];
     }
+    assert(ojbk % 2 == 0);
+    ojbk /= 2;
     return ojbk;
 }
 

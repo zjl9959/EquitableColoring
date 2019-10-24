@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "utils/utility.hpp"
+#include <cassert>
 
 namespace solver {
 

@@ -121,7 +121,6 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="checker.cpp" />
     <ClCompile Include="data.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="solver\evolution.cpp" />

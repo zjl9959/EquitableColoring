@@ -22,9 +22,6 @@
       <Filter>solver</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="checker.cpp">
-      <Filter>checker</Filter>
-    </ClCompile>
     <ClCompile Include="utils\utility.cpp">
       <Filter>utils</Filter>
     </ClCompile>

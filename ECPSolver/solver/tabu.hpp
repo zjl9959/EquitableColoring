@@ -17,6 +17,8 @@ private:
     void update_conflict_table(const Solution &sol, const Move &move, Table &conflict_table) const;
     int verify_obj() const;
 private:
+    int best_delt_;
+    int cur_iter_;
     int best_obj_, cur_obj_;
     Solution best_sol_, cur_sol_;
     const Input &input_;

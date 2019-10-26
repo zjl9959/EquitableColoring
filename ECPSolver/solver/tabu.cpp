@@ -21,11 +21,14 @@ TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(in
     assert(cur_obj_ % 2 == 0);
     cur_obj_ /= 2;
     best_obj_ = cur_obj_;
-    // [zjl][TODO] : init tabu_table
+    // init tabu table.
+    cur_iter_ = 0;
+    best_delt_ = input_.graph.nb_edge;
+    tabu_table_.resize(input.graph.nb_node, List<int>(input.nb_color, 0));
 }
 
 bool TabuSearch::run() {
-    long long iter = 0, no_improve_iter = 0;
+    int no_improve_iter = 0;
     while (!input_.timer.isTimeOut()) {
         List<Move> best_moves;
         ejection_local_search(best_moves);  // find move.
@@ -36,6 +39,9 @@ bool TabuSearch::run() {
             delt += conflict_table_[it->node][it->new_color] - conflict_table_[it->node][it->old_color];
             cur_sol_.update(it->node, it->new_color);
             update_conflict_table(cur_sol_, *it, conflict_table_);
+            best_delt_ = min(best_delt_, delt); // update best delt.
+            tabu_table_[it->node][it->old_color] =
+                cur_iter_ + input_.nb_color + input_.rand.genInt(input_.nb_color);  // update tabu table.
         }
         cur_obj_ += delt;
         int obj_verify = verify_obj();
@@ -56,7 +62,7 @@ bool TabuSearch::run() {
             ++no_improve_iter;
             // [zjl][TODO]: add some perturbation.
         }
-        ++iter;
+        ++cur_iter_;
     }
     return false;
 }
@@ -67,7 +73,7 @@ bool TabuSearch::run() {
  * RETURN: (current solution's objective after make best moves.)
 */
 void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
-    int best_obj = cur_obj_;
+    int best_obj = input_.graph.nb_edge;
     List<int> max_conflict_nodes;
     get_max_conflict_nodes(cur_sol_, conflict_table_, max_conflict_nodes);
     for (int node : max_conflict_nodes) {
@@ -87,28 +93,44 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
                 best_obj = obj + delt;
                 best_moves = move_chain;
                 best_moves.push_back(Move(node, ejected_node_color, trial_color));
-                break;  // first improvement with break, best improvement without break.
             }
             // find best move2(move2: ejection one node into trial color).
-            int pool_sampling_count = 0;
+            int pool_sampling_count = 0, pool_sampling_count_tabu = 0;
             int best_move2_delt = input_.graph.nb_edge;    // smaller is better.
-            Move best_move2;
+            int best_move2_delt_tabu = input_.graph.nb_edge;
+            Move best_move2, best_move2_tabu;
             for (int n = 0; n < input_.graph.nb_node; ++n) {
-                if (n != node && S[n] != trial_color && !S.in_small_color(n)) {   // [zjl][TODO]: consider tabu table.
+                if (n != node && S[n] != trial_color) {
                     int move2_delt = Ct[n][trial_color] - Ct[n][S[n]];
-                    if (move2_delt < best_move2_delt || (move2_delt == best_move2_delt &&
-                        input_.rand.genInt(pool_sampling_count) == 0)) {
-                        best_move2_delt = move2_delt;
-                        best_move2 = Move(n, S[n], trial_color);
-                        if (move2_delt < best_move2_delt)
-                            pool_sampling_count = 0;
-                        else
-                            ++pool_sampling_count;
+                    if (tabu_table_[n][trial_color] > cur_iter_) {
+                        if (move2_delt < best_move2_delt_tabu || (move2_delt == best_move2_delt_tabu &&
+                            input_.rand.genInt(pool_sampling_count_tabu) == 0)) {
+                            best_move2_delt_tabu = move2_delt;
+                            best_move2_tabu = Move(n, S[n], trial_color);
+                            if (move2_delt < best_move2_delt_tabu)
+                                pool_sampling_count_tabu = 0;
+                            else
+                                ++pool_sampling_count_tabu;
+                        }
+                    }
+                    else {
+                        if (move2_delt < best_move2_delt || (move2_delt == best_move2_delt &&
+                            input_.rand.genInt(pool_sampling_count) == 0)) {
+                            best_move2_delt = move2_delt;
+                            best_move2 = Move(n, S[n], trial_color);
+                            if (move2_delt < best_move2_delt)
+                                pool_sampling_count = 0;
+                            else
+                                ++pool_sampling_count;
+                        }
                     }
                 }
             }
             // choose the best move2 or random move by some probability.
             Move chosen_move2(best_move2);
+            if (best_move2_delt_tabu < best_delt_ && best_move2_delt_tabu < best_move2_delt) {
+                chosen_move2 = best_move2_tabu;
+            }
             if (best_move2.node == INVALID || input_.rand.genDouble(1.0) > input_.cfg.ejection_greedy_rate) {
                 int rand_node = input_.rand.genInt(input_.graph.nb_node);
                 chosen_move2 = Move(rand_node, S[rand_node], trial_color);
@@ -116,6 +138,8 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
             // update and record chosen move.
             if (chosen_move2.node == node)  // this should be the trial move, so skip.
                 continue;
+            obj += conflict_table_[chosen_move2.node][chosen_move2.new_color] -
+                conflict_table_[chosen_move2.node][chosen_move2.old_color];
             update_conflict_table(S, chosen_move2, Ct);
             S.update(chosen_move2.node, chosen_move2.new_color);
             move_chain.push_back(chosen_move2);

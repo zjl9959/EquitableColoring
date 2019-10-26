@@ -2,6 +2,7 @@
 #include "data.hpp"
 #include "solver/gen_init_sol.hpp"
 #include "solver/tabu.hpp"
+#include "checker.hpp"
 
 using namespace std;
 using namespace solver;
@@ -10,7 +11,7 @@ using namespace zjl_utility;
 int main(int argc, char* argv[]) {
     string instance = "DSJC125.1.col";
     // instance = "test/test_n8e11.col";
-    Input input(5, 180 * 1000, 23094, instance);
+    Input input(9, 180 * 1000, 23094, instance);
     Solution sol(input.graph.nb_node, input.nb_color);
     //Solution sol(input.env.solution_dir() + "init_sol/test_n8e11.txt", input.graph.node_id_map);
     gen_equitable_solution(input, sol);
@@ -21,6 +22,7 @@ int main(int argc, char* argv[]) {
         cout << "Find solution." << endl;
     else
         cout << "Not find solution." << endl;
+    checker_solution(input, sol);
     system("pause");
     return 0;
 }

@@ -6,7 +6,6 @@
 namespace solver {
 
 void gen_equitable_solution(const Input &input, Solution &sol) {
-    // [TODO][TEST]
     int small_color_size = input.graph.nb_node / input.nb_color;
     int big_color_size = small_color_size + 1;
     int nb_big_color = input.graph.nb_node % input.nb_color;

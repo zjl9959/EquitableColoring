@@ -6,6 +6,8 @@ using namespace zjl_utility;
 
 namespace solver {
 
+LogSwitch logsw_tabu(1, 1, "TABU");
+
 TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(input), cur_sol_(init_sol), best_sol_(init_sol) {
     // init conflict table
     conflict_table_.resize(input_.graph.nb_node, List<int>(input_.nb_color, 0));
@@ -21,12 +23,11 @@ TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(in
     cur_obj_ /= 2;
     best_obj_ = cur_obj_;
     // init tabu table.
-    cur_iter_ = 0;
-    best_delt_ = input_.graph.nb_edge;
     tabu_table_.resize(input.graph.nb_node, List<int>(input.nb_color, 0));
 }
 
 bool TabuSearch::run() {
+    bool find_solution = false;
     int no_improve_iter = 0;
     while (!input_.timer.isTimeOut()) {
         List<Move> best_moves;
@@ -38,9 +39,9 @@ bool TabuSearch::run() {
             delt += conflict_table_[it->node][it->new_color] - conflict_table_[it->node][it->old_color];
             cur_sol_.update(it->node, it->new_color);
             update_conflict_table(cur_sol_, *it, conflict_table_);
-            best_delt_ = min(best_delt_, delt); // update best delt.
+            info_.best_delt = min(info_.best_delt, delt); // update best delt.
             tabu_table_[it->node][it->old_color] =
-                cur_iter_ + input_.nb_color + input_.rand.genInt(input_.nb_color);  // update tabu table.
+                info_.iter_steps + input_.nb_color + input_.rand.genInt(input_.nb_color);  // update tabu table.
         }
         cur_obj_ += delt;
         assert(cur_obj_ == verify_obj(cur_sol_)); // check objective match.
@@ -53,7 +54,8 @@ bool TabuSearch::run() {
         }
         // check best_obj_'s equitable.
         if (best_obj_ == 0) {
-            return true;
+            find_solution = true;
+            break;
         }
         if (delt < 0) {
             no_improve_iter = 0;
@@ -61,9 +63,10 @@ bool TabuSearch::run() {
             ++no_improve_iter;
             // [zjl][TODO]: add some perturbation.
         }
-        ++cur_iter_;
+        ++info_.iter_steps;
     }
-    return false;
+    mylog << info_.str() << logsw_tabu;
+    return find_solution;
 }
 
 /*
@@ -101,7 +104,7 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
             for (int n = 0; n < input_.graph.nb_node; ++n) {
                 if (n != node && S[n] != trial_color) {
                     int move2_delt = Ct[n][trial_color] - Ct[n][S[n]];
-                    if (tabu_table_[n][trial_color] > cur_iter_) {
+                    if (tabu_table_[n][trial_color] > info_.iter_steps) {
                         if (move2_delt < best_move2_delt_tabu || (move2_delt == best_move2_delt_tabu &&
                             input_.rand.genInt(pool_sampling_count_tabu) == 0)) {
                             best_move2_delt_tabu = move2_delt;
@@ -127,7 +130,7 @@ void TabuSearch::ejection_local_search(List<Move> &best_moves) const {
             }
             // choose the best move2 or random move by some probability.
             Move chosen_move2(best_move2);
-            if (best_move2_delt_tabu < best_delt_ && best_move2_delt_tabu < best_move2_delt) {
+            if (best_move2_delt_tabu < info_.best_delt && best_move2_delt_tabu < best_move2_delt) {
                 chosen_move2 = best_move2_tabu;
             }
             if (best_move2.node == INVALID || input_.rand.genDouble(1.0) > input_.cfg.ejection_greedy_rate) {

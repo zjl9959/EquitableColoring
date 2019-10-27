@@ -80,7 +80,6 @@ void save_solution(const Solution &sol, const String &path, const IdMapInt<int> 
 }
 
 Solution::Solution(const String &path, const IdMapInt<int> &id_map) {
-    // [zjl][TEST]: not test!.
     ifstream ifs(path);
     if (!ifs.is_open())return;
     string line;

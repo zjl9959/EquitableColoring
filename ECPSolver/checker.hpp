@@ -6,7 +6,7 @@
 
 namespace solver {
 
-bool checker_solution(const Input &input, const Solution &sol) {
+bool check_solution(const Input &input, const Solution &sol) {
     bool valid_solution = true;
     UMap<int, int> counter;
     // check node assign color.

@@ -18,7 +18,6 @@ TabuSearch::TabuSearch(const Input &input, const Solution &init_sol) : input_(in
     cur_obj_ = 0;
     for (int i = 0; i < input_.graph.nb_node; ++i)
         cur_obj_ += conflict_table_[i][cur_sol_[i]];
-    assert(cur_obj_ % 2 == 0);
     cur_obj_ /= 2;
     best_obj_ = cur_obj_;
     // init tabu table.
@@ -44,8 +43,8 @@ bool TabuSearch::run() {
                 cur_iter_ + input_.nb_color + input_.rand.genInt(input_.nb_color);  // update tabu table.
         }
         cur_obj_ += delt;
-        int obj_verify = verify_obj();
-        assert(cur_obj_ == obj_verify); // check objective match.
+        assert(cur_obj_ == verify_obj(cur_sol_)); // check objective match.
+        assert(verify_conflict_table(cur_sol_, conflict_table_) == true);   // check conflict table correctness.
         // update best_sol_.
         if (cur_obj_ < best_obj_) {
             best_obj_ = cur_obj_;
@@ -172,14 +171,34 @@ void TabuSearch::update_conflict_table(const Solution &sol, const Move &move, Ta
 }
 
 /* RETURN: current solution's objective. */
-int TabuSearch::verify_obj() const {
-    int ojbk = 0;
-    for (int i = 0; i < input_.graph.nb_node; ++i) {
-        ojbk += conflict_table_[i][cur_sol_[i]];
+int TabuSearch::verify_obj(const Solution &sol) const {
+    int obj = 0;
+    for (int n = 0; n < input_.graph.nb_node; ++n) {
+        for (int neighbor : input_.graph.neighbors[n]) {
+            if (sol[n] == sol[neighbor])
+                ++obj;
+        }
     }
-    assert(ojbk % 2 == 0);
-    ojbk /= 2;
-    return ojbk;
+    assert(obj % 2 == 0);
+    return obj / 2;
+}
+
+/*Check current solution's conflict table correctness.*/
+bool TabuSearch::verify_conflict_table(const Solution &sol, const Table &table) const {
+    Table conflict_table(input_.graph.nb_node, List<int>(input_.nb_color, 0));
+    for (int n = 0; n < input_.graph.nb_node; ++n) {
+        for (int node : input_.graph.neighbors[n]) {
+            conflict_table[n][sol[node]]++;
+        }
+    }
+    for (int n = 0; n < input_.graph.nb_node; ++n) {
+        for (int c = 0; c < input_.nb_color; ++c) {
+            if (table[n][c] != conflict_table[n][c]) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 }

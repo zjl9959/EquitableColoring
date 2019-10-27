@@ -15,8 +15,8 @@ struct Environment {
 
     #pragma region interface
     const String instance_path() { return instance_dir() + instance_name; }
-    const String solution_path() { return solution_dir() + instance_name + ".txt"; }
-    const String solution_path_withtime() { return solution_dir() + instance_name + zjl_utility::Date::shortDateStr() + ".txt"; }
+    const String solution_path() { return solution_dir() + instance_name + ".sol"; }
+    const String solution_path_withtime() { return solution_dir() + instance_name + zjl_utility::Date::shortDateStr() + ".sol"; }
     const String configure_path() { return configure_dir() + configure_name; }
     
     static const String instance_dir() { return "Instances/"; }
@@ -97,6 +97,7 @@ public:
 
     /* create an empty solution. */
     Solution(int nb_node, int nb_color) {
+        small_color_size_ = nb_node / nb_color;
         node_color_.resize(nb_node, INVALID);
         color_size_.resize(nb_color, 0);
     }

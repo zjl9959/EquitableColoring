@@ -11,11 +11,13 @@ public:
 
     TabuSearch(const Input &input, const Solution &init_sol);
     bool run();
+    const Solution& get_best_sol() const { return best_sol_; }
 private:
     void ejection_local_search(List<Move> &best_moves) const;
     void get_max_conflict_nodes(const Solution &sol, const Table &conflict_table, List<int> &nodes) const;
     void update_conflict_table(const Solution &sol, const Move &move, Table &conflict_table) const;
-    int verify_obj() const;
+    int verify_obj(const Solution &sol) const;
+    bool verify_conflict_table(const Solution &sol, const Table &table) const;
 private:
     int best_delt_;
     int cur_iter_;
